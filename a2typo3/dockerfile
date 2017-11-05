@@ -15,8 +15,13 @@ sed -i "s|; max_input_vars = 1000|max_input_vars = 1500|g" /etc/php/7.0/apache2/
 sed -i "s|DocumentRoot /var/www/html|DocumentRoot /var/www/html/web|g" /etc/apache2/sites-available/000-default.conf && \
 cd /var/www/html/ && rm index.html && \
 composer create-project typo3/cms-base-distribution . && \
+composer require typo3-ter/news && \
+composer require friendsoftypo3/tt-address && \
+composer require typo3-ter/powermail && \
 touch ./web/FIRST_INSTALL && \
 chown -R www-data:www-data . && \
 exit && \
-EXPOSE 80 443 && \
-ENTRYPOINT service apache2 start
+CMD ["/usr/sbin/apache2ctl start", "-D", "FOREGROUND"]
+ENTRYPOINT service apache2 start && /bin/bash 
+EXPOSE 80 
+EXPOSE 443
