@@ -1,0 +1,22 @@
+FROM ubuntu:latest
+
+MAINTAINER daydreambeliever <info@daydreambeliever.de>
+
+RUN apt-get update
+RUN apt-get install -y apache2 curl zip php libapache2-mod-php  \
+php-fpm php-cli php-mysqlnd php-pgsql php-mbstring php-sqlite3 php-redis \
+php-apcu php-intl php-zip php-imagick php-mcrypt php-xml php-json php-gd php-curl && \
+phpenmod mcrypt
+RUN rm -rf /var/lib/apt/lists/*
+RUN cd /tmp && curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer && \
+/etc/init.d/apache2 start && \
+sed -i "s|max_execution_time = 30|max_execution_time = 240|g" /etc/php/7.0/apache2/php.ini && \
+sed -i "s|; max_input_vars = 1000|max_input_vars = 1500|g" /etc/php/7.0/apache2/php.ini && \
+sed -i "s|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g" /etc/apache2/sites-available/000-default.conf && \
+cd /var/www/html/ && rm index.html 
+RUN chown -R www-data:www-data . 
+VOLUME /var/www/html
+CMD ["/usr/sbin/apache2ctl start", "-D", "FOREGROUND"]
+ENTRYPOINT service apache2 start && /bin/bash 
+EXPOSE 80 
+EXPOSE 443
